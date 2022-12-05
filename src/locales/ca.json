@@ -130,13 +130,13 @@
       },
       "gainCard": {
         "matchSlot": "Luna guanya cadascuna de les cartes mostrades:",
-        "mostValuableShare": "Luna guanya la targeta amb la <b>part més valuosa</b> (si n'hi ha més d'una, la de l'espai amb el número més baix).",
+        "mostValuableShare": "Luna guanya la carta amb <b>l'acció (participació) més valuosa</b> (si n'hi ha més d'una, la de l'espai amb el número més baix).",
         "help": {
           "title": "Targetes guanyades",
-          "instruction": "Sempre que una acció em permeti guanyar targetes, agafeu les targetes designades de la pantalla de la targeta i col·loqueu-les en una pila cara avall a la meva reserva.",
-          "hint1": "Guanyar targetes no em costa res.",
-          "hint2": "No guanyo cap targeta si el seu espai designat està buit.",
-          "hint3": "Les targetes d'acció recollides romanen a la meva reserva fins a la fase de puntuació final.",
+          "instruction": "Sempre que una acció em permeti guanyar cartes, agafeu les cartes designades de la figura mostrada i col·loqueu-les en una pila cara avall a la meva reserva.",
+          "hint1": "Guanyar cartes no em costa res.",
+          "hint2": "No guanyo cap carta si el seu espai designat està buit.",
+          "hint3": "Les cartes d'acció recollides romanen a la meva reserva fins a la fase de puntuació final.",
           "hint4": "Sempre que guanyo la carta amb la <b>l'acció (participació) més valuosa</b> vol dir: Dóna'm la carta que mostri una participació addicional de l'empresa, que -entre les que es mostren- pertany a l'empresa més valuosa. Si hi ha diverses cartes d'aquesta empresa, doneu-me la de l'espai amb el número més baix. Si no hi ha cap carta amb participació al taulell, no guanyo cap targeta."
         }
       },
