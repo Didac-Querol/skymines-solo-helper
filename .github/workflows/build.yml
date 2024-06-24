@@ -16,19 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        cache: 'npm'
-
-    - run: npm install
-    - run: npm run test:coverage
-    - run: npm run build
-    - uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      - uses: brdgm/github-action-build@v1
+        with:
+          sonar-token: ${{ secrets.SONARCLOUD_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

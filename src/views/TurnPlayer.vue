@@ -17,28 +17,20 @@
 
   <FooterButtons :backButtonRouteTo="backButtonRouteTo" endGameButtonType="abortGame"/>
 
-  <div class="modal" tabindex="-1" id="modalPassInfo">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">{{t('turnPlayer.pass.title')}}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('action.close')"></button>
-        </div>
-        <div class="modal-body">
-          <ul>
-            <li v-html="t('turnPlayer.pass.step1')"></li>
-            <li v-html="t('turnPlayer.pass.step2')"></li>
-            <li v-html="t('turnPlayer.pass.step3')"></li>
-            <li v-html="t('turnPlayer.pass.step4')"></li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="pass()">{{t('action.pass')}}</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{t('action.cancel')}}</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <ModalDialog id="modalPassInfo" :title="t('turnPlayer.pass.title')">
+    <template #body>
+      <ul>
+        <li v-html="t('turnPlayer.pass.step1')"></li>
+        <li v-html="t('turnPlayer.pass.step2')"></li>
+        <li v-html="t('turnPlayer.pass.step3')"></li>
+        <li v-html="t('turnPlayer.pass.step4')"></li>
+      </ul>
+    </template>
+    <template #footer>
+      <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="pass()">{{t('action.pass')}}</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{t('action.cancel')}}</button>
+    </template>
+  </ModalDialog>
 
 </template>
 
@@ -47,25 +39,27 @@ import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FooterButtons from '@/components/structure/FooterButtons.vue'
 import { useRoute } from 'vue-router'
-import { useStore } from '@/store'
+import { useStateStore } from '@/store/state'
 import PlayerColorIcon from '@/components/structure/PlayerColorIcon.vue'
 import RouteCalculator from '@/services/RouteCalculator'
 import PlayerNavigationState from '@/util/PlayerNavigationState'
 import PlayerStatus from '@/components/turn/PlayerStatus.vue'
+import ModalDialog from '@brdgm/brdgm-commons/src/components/structure/ModalDialog.vue'
 
 export default defineComponent({
   name: 'TurnPlayer',
   components: {
     FooterButtons,
     PlayerColorIcon,
-    PlayerStatus
+    PlayerStatus,
+    ModalDialog
   },
   setup() {
     const { t } = useI18n()
     const route = useRoute()
-    const store = useStore()
+    const state = useStateStore()
 
-    const navigationState = new PlayerNavigationState(route, store.state);
+    const navigationState = new PlayerNavigationState(route, state)
     const playerCount = navigationState.playerCount
     const round = navigationState.round
     const turn = navigationState.turn
@@ -73,7 +67,7 @@ export default defineComponent({
     const playerColor = navigationState.playerColor
     const routeCalculator = new RouteCalculator({round:round, turn:turn, player:player})
 
-    return { t, playerCount, round, turn, player, playerColor, routeCalculator, navigationState }
+    return { t, state, playerCount, round, turn, player, playerColor, routeCalculator, navigationState }
   },
   data() {
     return {
@@ -82,7 +76,7 @@ export default defineComponent({
   },
   computed: {
     backButtonRouteTo() : string {
-      return this.routeCalculator.getBackRouteTo(this.$store.state)
+      return this.routeCalculator.getBackRouteTo(this.state)
     }
   },
   methods: {
@@ -93,14 +87,14 @@ export default defineComponent({
       this.nextWithPassed(true)
     },
     nextWithPassed(passed : boolean) {
-      this.$store.commit('turnPlayer', {
+      this.state.turnPlayer({
         round:this.round,
         turn:this.turn,
         player:this.player,
         claimFirstPlayer: this.claimFirstPlayer ? true : undefined,
         passed: passed ? true : undefined
       })
-      this.$router.push(this.routeCalculator.getNextRouteTo(this.$store.state))
+      this.$router.push(this.routeCalculator.getNextRouteTo(this.state))
     },
     firstPlayerClaimed() : void {
       this.claimFirstPlayer = true

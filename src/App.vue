@@ -5,110 +5,117 @@
     <router-view :key="$route.fullPath"/>
   </div>
 
-  <AppFooter :build-number="buildNumber" :credits-label="t('footer.credits')" credits-modal-id="creditsModal" zoom-enabled @zoomFontSize="zoomFontSize"/>
+  <AppFooter :build-number="buildNumber" :credits-label="t('footer.credits')" credits-modal-id="creditsModal" zoom-enabled
+      :base-font-size="baseFontSize" @zoomFontSize="zoomFontSize"/>
 
-  <div class="modal" tabindex="-1" id="errorMessage">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" :aria-label="t('action.close')"></button>
-        </div>
-        <div class="modal-body">
-          <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{t('action.close')}}</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <ModalDialog id="errorMessage">
+    <template #body>
+      <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
+    </template>
+  </ModalDialog>
 
-  <div class="modal" id="creditsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{t('footer.credits')}}</h5>
-          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <h4><a href="https://boardgamegeek.com/boardgame/359438/skymines" target="_blank" rel="noopener">{{t('gameTitle')}}</a></h4>
-          <dl>
-            <dt>Game design</dt>
-            <dd>Alexander Pfister, Viktor Kobilke</dd>
-            <dt>Graphics design</dt>
-            <dd>Javier González Cava</dd>
-            <dt>Publisher</dt>
-            <dd><a href="https://deep-print-games.com/" target="_blank" rel="noopener">Deep Print Games</a></dd>
-          </dl>
-          <h4 class="border-top pt-3">{{appTitle}}</h4>
-          <dl>
-            <dt>Application Development</dt>
-            <dd>Stefan Seifert</dd>
-            <dt>Version</dt>
-            <dd>{{buildNumber}}</dd>
-            <dt>Source Code (Apache-2.0 License)</dt>
-            <dd><a href="https://github.com/brdgm/skymines-solo-helper" target="_blank" rel="noopener">https://github.com/brdgm/skymines-solo-helper</a></dd>
-          </dl>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">{{t('action.close')}}</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <ModalDialog id="serviceWorkerUpdatedRefresh" :title="t('serviceWorkerUpdatedRefresh.title')">
+    <template #body>
+      <p v-html="t('serviceWorkerUpdatedRefresh.notice')"></p>
+    </template>
+    <template #footer>
+      <button class="btn btn-primary" data-bs-dismiss="modal" @click="updateServiceWorker()">{{t('serviceWorkerUpdatedRefresh.title')}}</button>
+      <button class="btn btn-secondary" data-bs-dismiss="modal">{{t('action.close')}}</button>
+    </template>
+  </ModalDialog>
+
+  <ModalDialog id="creditsModal" :title="t('footer.credits')">
+    <template #body>
+      <h4><a href="https://boardgamegeek.com/boardgame/359438/skymines" target="_blank" rel="noopener">{{t('gameTitle')}}</a></h4>
+      <dl>
+        <dt>Game design</dt>
+        <dd>Alexander Pfister, Viktor Kobilke</dd>
+        <dt>Graphics design</dt>
+        <dd>Javier González Cava</dd>
+        <dt>Publisher</dt>
+        <dd><a href="https://deep-print-games.com/" target="_blank" rel="noopener">Deep Print Games</a></dd>
+      </dl>
+      <h4 class="border-top pt-3">{{appTitle}}</h4>
+      <dl>
+        <dt>Application Development</dt>
+        <dd>Stefan Seifert</dd>
+        <dt>Version</dt>
+        <dd>{{buildNumber}} (<a href="https://github.com/brdgm/skymines-solo-helper/releases" target="_blank" rel="noopener">Change Log</a>)</dd>
+        <dt>Source Code (Apache-2.0 License)</dt>
+        <dd><a href="https://github.com/brdgm/skymines-solo-helper" target="_blank" rel="noopener">https://github.com/brdgm/skymines-solo-helper</a></dd>
+      </dl>
+    </template>
+  </ModalDialog>
 
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStore } from '@/store'
-import AppHeader from 'brdgm-commons/src/components/structure/AppHeader.vue'
-import AppFooter from 'brdgm-commons/src/components/structure/AppFooter.vue'
-import { Modal } from 'bootstrap'
-import getErrorMessage from 'brdgm-commons/src/util/error/getErrorMessage'
+import { useStateStore } from '@/store/state'
+import AppHeader from '@brdgm/brdgm-commons/src/components/structure/AppHeader.vue'
+import AppFooter from '@brdgm/brdgm-commons/src/components/structure/AppFooter.vue'
+import ModalDialog from '@brdgm/brdgm-commons/src/components/structure/ModalDialog.vue'
+import getErrorMessage from '@brdgm/brdgm-commons/src/util/error/getErrorMessage'
+import showModal, { showModalIfExist } from '@brdgm/brdgm-commons/src/util/modal/showModal'
+import { version, description } from '@/../package.json'
+import { registerSW } from 'virtual:pwa-register'
+import onRegisteredSWCheckForUpdate from '@brdgm/brdgm-commons/src/util/serviceWorker/onRegisteredSWCheckForUpdate'
 
 export default defineComponent({
   name: 'App',
   components: {
     AppHeader,
-    AppFooter
+    AppFooter,
+    ModalDialog
   },
   setup() {
     const { t, locale } = useI18n({
       inheritLocale: true,
       useScope: 'global'
     })
-    const store = useStore()
+    const state = useStateStore()
 
-    store.commit('initialiseStore')
-    locale.value = store.state.language
-    
-    const baseFontSize = ref(store.state.baseFontSize)
+    // handle PWA updates with prompt if a new version is detected, check regularly for a new version
+    const checkForNewVersionsIntervalSeconds = 1 * 60 * 60
+    const updateServiceWorker = registerSW({
+      // check for new app version, see https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html
+      onRegisteredSW(swScriptUrl : string, registration? : ServiceWorkerRegistration) {
+        onRegisteredSWCheckForUpdate(swScriptUrl, registration, checkForNewVersionsIntervalSeconds)
+      },
+      onNeedRefresh() {
+        showModalIfExist('serviceWorkerUpdatedRefresh')
+      }
+    })
 
-    return { t, locale, baseFontSize }
+    locale.value = state.language
+
+    return { t, state, locale, updateServiceWorker }
   },
   data() {
     return {
-      buildNumber: process.env.VUE_APP_BUILD_NUMBER || '',
-      appTitle: process.env.VUE_APP_TITLE,
+      buildNumber: version,
+      appTitle: description,
       errorMessage: 'Error'
+    }
+  },
+  computed: {
+    baseFontSize() : number {
+      return this.state.baseFontSize
     }
   },
   methods: {
     setLocale(lang: string) {
-      this.$store.commit('language', lang)
-      this.locale = lang;
+      this.locale = lang
+      this.state.language = lang
     },
     zoomFontSize(payload: { baseFontSize: number }) {
-      this.baseFontSize = payload.baseFontSize
-      this.$store.commit('zoomFontSize', this.baseFontSize)
+      this.state.baseFontSize = payload.baseFontSize
     }
   },
   errorCaptured(err : unknown) {
     this.errorMessage = getErrorMessage(err, translErr => this.t(translErr.key, translErr.named, translErr.plural))
-    const modal = new Modal(document.getElementById('errorMessage') as Element)
-    modal.show()
+    showModal('errorMessage')
   }
 })
 </script>
@@ -116,6 +123,7 @@ export default defineComponent({
 <style lang="scss">
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
 @import "bootstrap/scss/maps";
 @import "bootstrap/scss/utilities";
 #content-container {

@@ -1,9 +1,9 @@
-import { LunaStatePersistence, Round, Turn } from "@/store";
+import { LunaStatePersistence, Round, Turn } from '@/store/state'
 
 export default function (params?: MockRoundParams) : Round {
   return {
     round: params?.round ?? 1,
-    initialLunaStates: params?.initialLunaStates || [],
+    initialLunaStates: params?.initialLunaStates ?? [],
     turns: params?.turns ?? []
   }
 }

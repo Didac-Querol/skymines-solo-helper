@@ -1,12 +1,12 @@
-import findMandatory from "brdgm-commons/src/util/map/findMandatory";
-import Card from "./Card";
-import Action from "./enum/Action";
-import CardSelection from "./enum/CardSelection";
-import CompanySelection from "./enum/CompanySelection";
-import Grade from "./enum/Grade";
-import ResearchPlanSelection from "./enum/ResearchPlanSelection";
-import SectorSelection from "./enum/SectorSelection";
-import Slot from "./enum/Slot";
+import findMandatory from '@brdgm/brdgm-commons/src/util/map/findMandatory'
+import Card from './Card'
+import Action from './enum/Action'
+import CardSelection from './enum/CardSelection'
+import CompanySelection from './enum/CompanySelection'
+import Grade from './enum/Grade'
+import ResearchPlanSelection from './enum/ResearchPlanSelection'
+import SectorSelection from './enum/SectorSelection'
+import Slot from './enum/Slot'
 
 const cards = [
   {
@@ -155,6 +155,7 @@ const cards = [
       {
         action: Action.EXPAND_COMPANY,
         count: 2,
+        companySelection: CompanySelection.LEAD_BIGGEST_MARGIN,
         sectorSelection: SectorSelection.MIN
       }
     ]
@@ -173,6 +174,7 @@ const cards = [
       {
         action: Action.EXPAND_COMPANY,
         count: 2,
+        companySelection: CompanySelection.LEAD_BIGGEST_MARGIN,
         sectorSelection: SectorSelection.MAX
       }
     ]
@@ -248,6 +250,7 @@ const cards = [
       {
         action: Action.EXPAND_COMPANY,
         count: 3,
+        companySelection: CompanySelection.LEAST_VALUABLE,
         sectorSelection: SectorSelection.MAX
       }
     ]
@@ -380,6 +383,7 @@ const cards = [
       {
         action: Action.EXPAND_COMPANY,
         count: 3,
+        companySelection: CompanySelection.LEAD_BIGGEST_MARGIN,
         sectorSelection: SectorSelection.MAX
       }
     ]
@@ -500,6 +504,7 @@ const cards = [
       {
         action: Action.EXPAND_COMPANY,
         count: 2,
+        companySelection: CompanySelection.LEAD_BIGGEST_MARGIN_TWO_EACH,
         sectorSelection: SectorSelection.MIN
       }
     ]

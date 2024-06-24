@@ -1,12 +1,12 @@
 <template>
   <table>
     <tr>
-      <th colspan="2">
+      <th colspan="2" scope="col">
         <h3 v-html="t('endOfGame.scoring.companyValueTitle')"></h3>
       </th>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="astrogo-enterprises" class="icon"/>
         {{t('endOfGame.scoring.shareValue')}}
       </th>
@@ -15,7 +15,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="tawac-industries" class="icon"/>
         {{t('endOfGame.scoring.shareValue')}}
       </th>
@@ -24,7 +24,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="skymine-resources" class="icon"/>
         {{t('endOfGame.scoring.shareValue')}}
       </th>
@@ -33,7 +33,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="minerva-corp" class="icon"/>
         {{t('endOfGame.scoring.shareValue')}}
       </th>
@@ -45,20 +45,20 @@
 
   <table class="mt-3">
     <tr>
-      <th>
+      <th scope="col">
         <h3 v-html="t('endOfGame.scoring.scoringTitle')"></h3>
       </th>
-      <th v-for="player in playerCount" :key="player">
+      <th v-for="player in playerCount" :key="player" scope="col">
         <PlayerColorIcon :playerColor="playerColors[player-1]" class="playerIcon"/>
         <span>{{t('turnPlayer.title', {player:player}, playerCount)}}</span>
       </th>
-      <th v-for="bot in botCount" :key="bot">
+      <th v-for="bot in botCount" :key="bot" scope="col">
         <PlayerColorIcon :playerColor="playerColors[playerCount+bot-1]" class="playerIcon"/>
         <span>{{t('turnBot.title', {bot:bot}, botCount)}}</span>
       </th>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="astrogo-enterprises" class="icon"/>
         {{t('endOfGame.scoring.shareCount')}}
       </th>
@@ -67,7 +67,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="tawac-industries" class="icon"/>
         {{t('endOfGame.scoring.shareCount')}}
       </th>
@@ -76,7 +76,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="skymine-resources" class="icon"/>
         {{t('endOfGame.scoring.shareCount')}}
       </th>
@@ -85,7 +85,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="company" name="minerva-corp" class="icon"/>
         {{t('endOfGame.scoring.shareCount')}}
       </th>
@@ -94,7 +94,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="action" name="gain-coin" class="icon"/>
         {{t('endOfGame.scoring.crypCoin')}}
       </th>
@@ -103,7 +103,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="action" name="gain-helium" class="icon"/>
         {{t('endOfGame.scoring.heliumCoin')}}
       </th>
@@ -112,7 +112,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         <AppIcon type="action" name="advance-research" class="icon"/>
         {{t('endOfGame.scoring.researchCoin')}}
       </th>
@@ -121,7 +121,7 @@
       </td>
     </tr>
     <tr>
-      <th>
+      <th scope="row">
         {{t('endOfGame.scoring.totalCoin')}}
       </th>
       <td v-for="index in playerCount+botCount" :key="index">
@@ -132,7 +132,7 @@
 </template>
 
 <script lang="ts">
-import { useStore } from '@/store'
+import { useStateStore } from '@/store/state'
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PlayerColorIcon from '@/components/structure/PlayerColorIcon.vue'
@@ -149,16 +149,16 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n()
-    const store = useStore()
+    const state = useStateStore()
 
-    const playerSetup = store.state.setup.playerSetup
+    const playerSetup = state.setup.playerSetup
     const playerCount = playerSetup.playerCount
     const botCount = playerSetup.botCount
     const playerColors = playerSetup.playerColors
 
     const lunaStates : LunaState[] = []
     for (let bot=1; bot<=botCount; bot++) {
-      lunaStates[bot-1] = getLunaState(store.state, 7, MAX_TURN, bot)
+      lunaStates[bot-1] = getLunaState(state, 7, MAX_TURN, bot)
     }
 
     return { t, playerCount, botCount, playerColors, lunaStates }

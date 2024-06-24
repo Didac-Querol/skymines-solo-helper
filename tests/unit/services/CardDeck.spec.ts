@@ -4,7 +4,7 @@ import Action from '@/services/enum/Action'
 import DifficultyLevel from '@/services/enum/DifficultyLevel'
 import MajorityType from '@/services/enum/MajorityType'
 import Slot from '@/services/enum/Slot'
-import { CardSlotPersistence } from '@/store'
+import { CardSlotPersistence } from '@/store/state'
 import { expect } from 'chai'
 import mockCardDeck from '../helper/mockCardDeck'
 
@@ -209,10 +209,12 @@ describe('services/CardDeck', () => {
     expect(cardDeck.hasNextActions, 'card-3 hasNextActions').to.true
     expect(cardDeck.leftMajoritySlot, 'card-3 leftMajoritySlot').to.not.undefined
     expect(cardDeck.rightMajoritySlot, 'card-3 rightMajoritySlot').to.not.undefined
+    expect(cardDeck.hasCardsDrawn, 'card-3 has cards drawn').to.true
 
     expect(cardDeck.getNextActions().map(item => item.action), 'card-4 actions').to.eql([Action.GAIN_COIN,Action.ADVANCE_COMPANY,Action.PLACE_BONUS_MARKER])
     expect(cardDeck.hasNextActions, 'card-4 hasNextActions').to.false
     cardDeck.discardSlotCardsAndOneMajorityCard()
+    expect(cardDeck.hasCardsDrawn, 'card-4 has cards drawn').to.true
 
     const leftDiscarded = cardDeck.discard[0].majorityCountLeft > cardDeck.discard[0].majorityCountRight
     const rightDiscarded = cardDeck.discard[0].majorityCountRight > cardDeck.discard[0].majorityCountLeft

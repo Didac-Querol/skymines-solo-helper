@@ -1,12 +1,12 @@
-import { CardDeckPersistence } from "@/store"
-import * as _ from "lodash"
-import Card, { CardAction } from "./Card"
-import Cards from "./Cards"
-import CardSlot from "./CardSlot"
-import DifficultyLevel from "./enum/DifficultyLevel"
-import Grade from "./enum/Grade"
-import MajorityType from "./enum/MajorityType"
-import Slot from "./enum/Slot"
+import { CardDeckPersistence } from '@/store/state'
+import { shuffle, clone } from 'lodash'
+import Card, { CardAction } from './Card'
+import Cards from './Cards'
+import CardSlot from './CardSlot'
+import DifficultyLevel from './enum/DifficultyLevel'
+import Grade from './enum/Grade'
+import MajorityType from './enum/MajorityType'
+import Slot from './enum/Slot'
 
 /**
  * Luna Card Deck
@@ -80,10 +80,10 @@ export default class CardDeck {
   }
 
   /**
-   * Has cards drawn.
+   * Has cards drawn (in slots or majority slots).
    */
   public get hasCardsDrawn() : boolean {
-    return this._slots.length > 0
+    return this._slots.length > 0 || this._leftMajoritySlot != undefined || this._rightMajoritySlot != undefined
   }
 
   /**
@@ -97,7 +97,8 @@ export default class CardDeck {
     }
     const newCard = this._pile.shift()
     if (!newCard) {
-      throw new Error('No card left in pile and discard.')
+      throw new Error(`No card left in pile and discard.\n
+        Debug Info: ${JSON.stringify(this.toPersistence())}`)
     }
     return newCard
   }
@@ -115,7 +116,7 @@ export default class CardDeck {
         this._pile.push(grade2Card)
       }
     }
-    this._pile = _.shuffle(this._pile)
+    this._pile = shuffle(this._pile)
   }
 
   /**
@@ -204,7 +205,7 @@ export default class CardDeck {
     if (!this._leftMajoritySlot || !this._rightMajoritySlot || this._discard.length == 0) {
       return
     }
-    this._discard = _.shuffle(this._discard)
+    this._discard = shuffle(this._discard)
     const discardCard = this._discard[0]
     if (discardCard.majorityCountLeft > discardCard.majorityCountRight) {
       this.discardLeftMajoritySlot()
@@ -259,7 +260,7 @@ export default class CardDeck {
       rightMajoritySlot: this._rightMajoritySlot ? this._rightMajoritySlot.id : undefined,
       slots: this._slots.map(item => ({slot:item.slot, card:item.card.id, flipped:item.flipped})),
       discard: this._discard.map(card => card.id),
-      availableSlots: _.clone(this._availableSlots)
+      availableSlots: clone(this._availableSlots)
     }
   }
 
@@ -268,8 +269,8 @@ export default class CardDeck {
    */
   public static new(difficultyLevel : DifficultyLevel) : CardDeck {
     return new CardDeck(
-      _.shuffle(Cards.getAll(Grade.GRADE_1)),
-      _.shuffle(Cards.getAll(Grade.GRADE_2)),
+      shuffle(Cards.getAll(Grade.GRADE_1)),
+      shuffle(Cards.getAll(Grade.GRADE_2)),
       undefined, undefined, [], [],
       [Slot.B,Slot.C,Slot.D],
       difficultyLevel
@@ -287,7 +288,7 @@ export default class CardDeck {
       persistence.rightMajoritySlot ? Cards.get(persistence.rightMajoritySlot) : undefined,
       persistence.slots.map(item => ({slot:item.slot, card:Cards.get(item.card), flipped:item.flipped})),
       persistence.discard.map(Cards.get),
-      _.clone(persistence.availableSlots),
+      clone(persistence.availableSlots),
       difficultyLevel
     )
   }

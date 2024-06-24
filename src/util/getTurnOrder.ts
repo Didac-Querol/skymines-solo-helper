@@ -1,5 +1,5 @@
-import { State } from "@/store"
-import getPlayerOrder from "./getPlayerOrder"
+import { State } from '@/store/state'
+import getPlayerOrder from './getPlayerOrder'
 
 /**
  * Generate list of all player/bot turns - leaving out steps after player/bot has passed.
@@ -15,7 +15,7 @@ export default function(state: State, round: number, turn: number, startPlayer: 
   const playerOrder = getPlayerOrder(playerCount, botCount, startPlayer)
   
   const currentRound = state.rounds.find(item => item.round==round)
-  const turns = currentRound?.turns || []
+  const turns = currentRound?.turns ?? []
   const steps : TurnOrder[] = []
 
   let invalidTurn = false
